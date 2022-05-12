@@ -713,14 +713,7 @@ public class App21 {
     }
 
     void NOTI_DATA(final Result result) {
-        //
-        String name = mContext.getPackageName();
-        SharedPreferences sharedPref = mContext.getSharedPreferences(name, Context.MODE_PRIVATE);
-        String z = sharedPref.getString("NOTI_DATA", null);
-        Gson gson = new Gson();
-        Map<String,String> data = gson.fromJson(z,Map.class  );
-        //
-        result.data = data;
+        result.data = ((MainActivity) mContext).getBundle();
         result.success = true;
         App21Result(result);
     }
