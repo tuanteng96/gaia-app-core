@@ -1,54 +1,48 @@
 package vn.cser21;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
-import androidx.annotation.NonNull;
-
-import android.annotation.SuppressLint;
-import android.Manifest;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.content.Context;
-import android.provider.MediaStore;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
-import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
-
-import android.util.Log;
-import android.view.KeyEvent;
-import android.webkit.WebView;
-import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -135,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         // call app
         Log.i("123321", event.duration + "---" + event.id);
 
-        String script = "NotiMp3Push(" + event.id + ","+event.duration+")";
+        String script = "NotiMp3Push(" + event.id + "," + event.duration + ")";
         // wv.evaluateJavascript(script, null);
 
         //MainActivity m = (MainActivity) mContext;
@@ -310,8 +304,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         });
     }
 
-    public static int dpToPx(int dp)
-    {
+    public static int dpToPx(int dp) {
         return (int) (dp / Resources.getSystem().getDisplayMetrics().density);
     }
 
@@ -324,8 +317,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         return result;
     }
 
-    public int getNavigationBarHeight()
-    {
+    public int getNavigationBarHeight() {
         Context context = this;
         Resources resources = context.getResources();
         int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
@@ -365,6 +357,27 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
 
         setContentView(R.layout.activity_main);
+
+        // Get Token Key
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+                        String name = getPackageName();
+                        SharedPreferences sharedPref = getSharedPreferences(name, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("FirebaseNotiToken", token);
+                        editor.commit();
+                    }
+                });
 
         //loadr
 
@@ -439,10 +452,21 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         Gson gson = new Gson();
 
         String jsonExtras = extras == null ? "{}" : gson.toJson(mapBundle(extras));
-        html = html.replace("<body>", "<body><script> var ANDROID_EXTRAS =" + jsonExtras + "; document.documentElement.style.setProperty('--f7-safe-area-top', '"+getStatusBarHeight()+"px'); document.documentElement.style.setProperty('--f7-safe-area-bottom', '"+getNavigationBarHeight()+"px')</script>");
+        html = html.replace("<body>", "<body><script> var ANDROID_EXTRAS =" + jsonExtras + "; document.documentElement.style.setProperty('--f7-safe-area-top', '" + getStatusBarHeight() + "px'); document.documentElement.style.setProperty('--f7-safe-area-bottom', '" + getNavigationBarHeight() + "px')</script>");
         wv.loadDataWithBaseURL(domain, html + "", "text/html", "utf-8", "");
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.getStringExtra("NOTI_ID") != null && intent.getStringExtra("click_action") != null)
+            if (!intent.getStringExtra("NOTI_ID").isEmpty() && !intent.getStringExtra("click_action").isEmpty()) {
+                Intent start = intent;
+                startActivity(start);
+                start = new Intent();
+                finish();
+            }
+    }
 
     @Override
     protected void onResume() {
