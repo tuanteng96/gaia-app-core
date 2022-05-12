@@ -655,7 +655,7 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
 //        wv.scrollView.showsHorizontalScrollIndicator = false;
 //        wv.scrollView.showsVerticalScrollIndicator = false;
 //
-//        let link = URL(string:"https://c1c9-2405-4803-ff21-ad10-fdbd-cb4d-4d1c-79db.ap.ngrok.io")!
+//        let link = URL(string:"https://c676-2405-4803-ff27-1e60-d905-57b8-a7f9-f7da.ap.ngrok.io")!
 //        let request = URLRequest(url: link)
 //        wv.load(request);
 //        view.addSubview(wv);

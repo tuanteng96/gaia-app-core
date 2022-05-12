@@ -22,6 +22,7 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -123,6 +124,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         for (String key : data.keySet()) {
             intent.putExtra(key, data.get(key));
         }
+
+        //
+        Gson gson = new Gson();
+        String notiDataStr = gson.toJson(data);
+        String name = this.getPackageName();
+        SharedPreferences sharedPref = this.getSharedPreferences(name, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("NOTI_DATA", notiDataStr);
+        editor.commit();
+        //
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
