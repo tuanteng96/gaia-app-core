@@ -1,0 +1,6 @@
+framework module Pods_hoccunggaia_hoccunggaiaUITests {
+  umbrella header "Pods-hoccunggaia-hoccunggaiaUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}
