@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 31
     defaultConfig {
-        applicationId "vn.edu.hoccunggaia"
+        applicationId "vn.quanlywow"
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 4
@@ -25,7 +25,7 @@ android {
 
     productFlavors {
         prod {
-            applicationId "vn.edu.hoccunggaia"
+            applicationId "vn.quanlywow"
             versionCode 4
             versionName "4"
         }
