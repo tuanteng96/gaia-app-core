@@ -99,11 +99,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     public void sendNotification(Intent intentNoti) {
-        if (intentNoti.getStringExtra("body") == null) return;
+        if (intentNoti.getStringExtra("gcm.notification.body") == null) return;
 
         // cái này là lấy nội dung từ trên server trả về
-        String content = intentNoti.getStringExtra("body").toString();
-        String title = intentNoti.getStringExtra("title").toString();
+        String content = intentNoti.getStringExtra("gcm.notification.body").toString();
+        String title = intentNoti.getStringExtra("gcm.notification.title").toString();
 
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
